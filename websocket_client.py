@@ -10,27 +10,35 @@ import torch
 import requests
 from io import BytesIO
 from huggingface_hub import login
+from dotenv import load_dotenv
+import os
 
 WS_URL = "wss://vsscustom.report.api.lacak.io/vss-ticket-websocket"
 AUTH_URL = "https://vsscustom.report.api.lacak.io/auth/login"
 USERNAME = "ckkim"
 PASSWORD = "Ck-kim24"
 
-hf_token = os.getenv("HF_TOKEN")
+# Hanya load .env jika tidak dijalankan di GitHub Actions
+if not os.getenv("GITHUB_ACTIONS"):
+    from dotenv import load_dotenv
+    load_dotenv()
+
+hf_token = os.getenv("HF_TOKEN_R_MODEL")
+
+if not hf_token:
+    raise EnvironmentError("❌ HF_TOKEN_R_MODEL is not set.")
+
 login(token=hf_token)
 
-# Load model & processor sesuai det_type
 model_yawn = AutoModelForImageClassification.from_pretrained(
-    "afrizalmeka/yawning-model", use_auth_token=True)
-
+    "afrizalmeka/yawning-model", use_auth_token=hf_token)
 proc_yawn = AutoImageProcessor.from_pretrained(
-    "afrizalmeka/yawning-model", use_auth_token=True)
-
+    "afrizalmeka/yawning-model", use_auth_token=hf_token)
 model_eye = AutoModelForImageClassification.from_pretrained(
-    "afrizalmeka/eyes-closed-model", use_auth_token=True)
-
+    "afrizalmeka/eyes-closed-model", use_auth_token=hf_token)
 proc_eye = AutoImageProcessor.from_pretrained(
-    "afrizalmeka/eyes-closed-model", use_auth_token=True)
+    "afrizalmeka/eyes-closed-model", use_auth_token=hf_token)
+
 
 
 def get_model_by_type(det_type):
