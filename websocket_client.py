@@ -4,7 +4,7 @@ import websockets
 import asyncio
 import httpx
 from api_client import send_result_to_be
-from transformers import AutoModelForImageClassification, AutoImageProcessor
+from transformers import AutoModelForVideoClassification, AutoImageProcessor
 from PIL import Image
 import torch
 import requests
@@ -30,14 +30,19 @@ if not hf_token:
 
 login(token=hf_token)
 
-model_yawn = AutoModelForImageClassification.from_pretrained(
-    "afrizalmeka/yawning-model", use_auth_token=hf_token)
+model_yawn = AutoModelForVideoClassification.from_pretrained(
+    "afrizalmeka/yawning-model", token=hf_token
+)
 proc_yawn = AutoImageProcessor.from_pretrained(
-    "afrizalmeka/yawning-model", use_auth_token=hf_token)
-model_eye = AutoModelForImageClassification.from_pretrained(
-    "afrizalmeka/eyes-closed-model", use_auth_token=hf_token)
+    "afrizalmeka/yawning-model", token=hf_token
+)
+
+model_eye = AutoModelForVideoClassification.from_pretrained(
+    "afrizalmeka/eyes-closed-model", token=hf_token
+)
 proc_eye = AutoImageProcessor.from_pretrained(
-    "afrizalmeka/eyes-closed-model", use_auth_token=hf_token)
+    "afrizalmeka/eyes-closed-model", token=hf_token
+)
 
 
 
