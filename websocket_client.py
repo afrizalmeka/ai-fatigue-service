@@ -85,8 +85,17 @@ async def predict_fatigue(data: dict) -> bool:
     return predicted
 
 async def handle_message(message: str):
-    print("Received:", message)
-    msg = json.loads(message)
+    print("Received:", repr(message))  # Debug output
+
+    if not message.strip():
+        print("⚠️ Received empty message. Skipping...")
+        return
+
+    try:
+        msg = json.loads(message)
+    except json.JSONDecodeError as e:
+        print(f"⚠️ JSON decode error: {e}. Message was: {repr(message)}")
+        return
 
     if msg.get("messageType") == "FATIGUE":
         data = msg.get("data", {})
@@ -100,6 +109,7 @@ async def handle_message(message: str):
             alarm_id = data.get("alarm_id")
             device_no = data.get("device_no")
             await send_result_to_be(alarm_id, device_no)
+
 
 async def get_token():
     async with httpx.AsyncClient() as client:
