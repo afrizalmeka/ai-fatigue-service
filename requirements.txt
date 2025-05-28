@@ -2,7 +2,7 @@ fastapi
 uvicorn
 requests
 httpx
-websockets>=11.0
+websockets==11.0
 torch>=2.1.0
 transformers>=4.41.0
 Pillow
