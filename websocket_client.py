@@ -85,7 +85,7 @@ async def predict_fatigue(data: dict) -> bool:
     return predicted
 
 async def handle_message(message: str):
-    print("Received:", repr(message))  # Debug output
+    print("📩 Raw WebSocket message:", repr(message))  # tampilkan isi asli pesan apa adanya
 
     if not message.strip():
         print("⚠️ Received empty message. Skipping...")
@@ -93,22 +93,26 @@ async def handle_message(message: str):
 
     try:
         msg = json.loads(message)
-    except json.JSONDecodeError as e:
-        print(f"⚠️ JSON decode error: {e}. Message was: {repr(message)}")
+    except json.JSONDecodeError:
+        print(f"⚠️ JSON decode error: Message is not valid JSON. Skipped. Content: {repr(message)}")
         return
 
-    if msg.get("messageType") == "FATIGUE":
-        data = msg.get("data", {})
-        det_type = str(data.get("det_type", ""))
+    # Hanya proses pesan bertipe FATIGUE
+    if msg.get("messageType") != "FATIGUE":
+        print("⏭️ Bukan pesan FATIGUE, dilewati.")
+        return
 
-        if det_type not in ["65", "66"]:
-            print("Ignored: det_type bukan yawning (66) atau eyes closed (65)")
-            return
+    data = msg.get("data", {})
+    det_type = str(data.get("det_type", ""))
 
-        if await predict_fatigue(data):
-            alarm_id = data.get("alarm_id")
-            device_no = data.get("device_no")
-            await send_result_to_be(alarm_id, device_no)
+    if det_type not in ["65", "66"]:
+        print(f"⏭️ det_type {det_type} bukan 65/66, dilewati.")
+        return
+
+    if await predict_fatigue(data):
+        alarm_id = data.get("alarm_id")
+        device_no = data.get("device_no")
+        await send_result_to_be(alarm_id, device_no)
 
 
 async def get_token():
