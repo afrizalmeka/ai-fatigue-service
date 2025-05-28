@@ -12,6 +12,7 @@ from io import BytesIO
 from huggingface_hub import login
 from dotenv import load_dotenv
 import os
+import traceback
 
 WS_URL = "wss://vsscustom.report.api.lacak.io/vss-ticket-websocket"
 AUTH_URL = "https://vsscustom.report.api.lacak.io/auth/login"
@@ -124,4 +125,5 @@ async def start_websocket_listener():
                     await handle_message(msg)
         except Exception as e:
             print(f"WebSocket error: {e}. Retrying in 5s...")
+            traceback.print_exc()  # Cetak traceback lengkap
             await asyncio.sleep(5)
