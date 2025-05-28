@@ -1,0 +1,114 @@
+import os
+import json
+import websockets
+import asyncio
+import httpx
+from api_client import send_result_to_be
+from transformers import AutoModelForImageClassification, AutoImageProcessor
+from PIL import Image
+import torch
+import requests
+from io import BytesIO
+from huggingface_hub import login
+
+WS_URL = "wss://vsscustom.report.api.lacak.io/vss-ticket-websocket"
+AUTH_URL = "https://vsscustom.report.api.lacak.io/auth/login"
+USERNAME = "ckkim"
+PASSWORD = "Ck-kim24"
+
+hf_token = os.getenv("HF_TOKEN")
+login(token=hf_token)
+
+# Load model & processor sesuai det_type
+model_yawn = AutoModelForImageClassification.from_pretrained(
+    "afrizalmeka/yawning-model", use_auth_token=True)
+
+proc_yawn = AutoImageProcessor.from_pretrained(
+    "afrizalmeka/yawning-model", use_auth_token=True)
+
+model_eye = AutoModelForImageClassification.from_pretrained(
+    "afrizalmeka/eyes-closed-model", use_auth_token=True)
+
+proc_eye = AutoImageProcessor.from_pretrained(
+    "afrizalmeka/eyes-closed-model", use_auth_token=True)
+
+
+def get_model_by_type(det_type):
+    if det_type == "66":
+        return model_yawn, proc_yawn
+    elif det_type == "65":
+        return model_eye, proc_eye
+    else:
+        return None, None
+
+async def predict_fatigue(data: dict) -> bool:
+    det_type = str(data.get("det_type", ""))
+    directory = data.get("directory")
+    video_file_name = data.get("video_file_name")
+
+    model, processor = get_model_by_type(det_type)
+    if not model or not processor:
+        print("det_type tidak dikenali:", det_type)
+        return False
+
+    # Ambil thumbnail/frame dari video untuk testing (sementara pakai gambar .jpg jika tersedia)
+    image_url = f"{directory}/{video_file_name.replace('.mp4', '.jpg')}"
+    print("Ambil image dari:", image_url)
+
+    try:
+        response = requests.get(image_url, timeout=10)
+        image = Image.open(BytesIO(response.content)).convert("RGB")
+    except Exception as e:
+        print("Gagal download atau baca gambar:", e)
+        return False
+
+    inputs = processor(images=image, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    predicted = outputs.logits.argmax(-1).item() == 1
+    print(f"Hasil prediksi (det_type {det_type}):", predicted)
+    return predicted
+
+async def handle_message(message: str):
+    print("Received:", message)
+    msg = json.loads(message)
+
+    if msg.get("messageType") == "FATIGUE":
+        data = msg.get("data", {})
+        det_type = str(data.get("det_type", ""))
+
+        if det_type not in ["65", "66"]:
+            print("Ignored: det_type bukan yawning (66) atau eyes closed (65)")
+            return
+
+        if await predict_fatigue(data):
+            alarm_id = data.get("alarm_id")
+            device_no = data.get("device_no")
+            await send_result_to_be(alarm_id, device_no)
+
+async def get_token():
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            AUTH_URL,
+            json={"username": USERNAME, "password": PASSWORD},
+            headers={"Content-Type": "application/json"}
+        )
+        token = response.json().get("token")
+        print("Bearer token retrieved")
+        return token
+
+async def start_websocket_listener():
+    while True:
+        try:
+            token = await get_token()
+            headers = [("Authorization", f"Bearer {token}")]
+
+            async with websockets.connect(WS_URL, extra_headers=headers) as websocket:
+                print("Connected to WebSocket")
+                while True:
+                    msg = await websocket.recv()
+                    await handle_message(msg)
+        except Exception as e:
+            print(f"WebSocket error: {e}. Retrying in 5s...")
+            await asyncio.sleep(5)

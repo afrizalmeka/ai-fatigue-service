@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+requests
+httpx
+websockets>=11.0
+transformers
+torch
+Pillow
+huggingface_hub
+python-dotenv
+opencv-python
