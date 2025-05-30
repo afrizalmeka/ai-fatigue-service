@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 import os
 import traceback
 
-WS_URL = "wss://vsscustom.report.api.lacak.io/vss-ticket-websocket"
+WS_URL = "wss://vsscustom.report.api.lacak.io/vss-ticket-websocket?email=ckbmb@test.com"
 AUTH_URL = "https://vsscustom.report.api.lacak.io/auth/login"
 USERNAME = "ckkim"
 PASSWORD = "Ck-kim24"
