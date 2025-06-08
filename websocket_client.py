@@ -85,7 +85,7 @@ async def predict_fatigue(data: dict) -> bool:
     return predicted
 
 async def handle_message(message: str):
-    print("📩 Raw WebSocket message:", repr(message))  # tampilkan isi asli pesan apa adanya
+    print("📩 Raw WebSocket message:", repr(message), flush=True)  # tampilkan isi asli pesan apa adanya
 
     if not message.strip():
         print("⚠️ Received empty message. Skipping...")
