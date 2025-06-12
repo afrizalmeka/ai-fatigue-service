@@ -11,6 +11,9 @@ async def send_result_to_be(alarm_id: str, device_no: str):
 
     token = await get_token()  # get fresh token every call
 
+    print(f"📦 Payload yang dikirim ke BE:\n{payload}")
+    print(f"🔐 Bearer Token: {token[:10]}...")  # Hanya tampilkan sebagian token untuk keamanan
+
     async with httpx.AsyncClient() as client:
         response = await client.post(
             API_URL,
