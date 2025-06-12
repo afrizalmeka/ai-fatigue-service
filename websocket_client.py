@@ -31,27 +31,32 @@ if not hf_token:
 
 login(token=hf_token)
 
-model_yawn = AutoModelForVideoClassification.from_pretrained(
-    "afrizalmeka/yawning-model", token=hf_token
-)
-proc_yawn = AutoImageProcessor.from_pretrained(
-    "afrizalmeka/yawning-model", token=hf_token
+# model_yawn = AutoModelForVideoClassification.from_pretrained(
+#     "afrizalmeka/yawning-model", token=hf_token
+# )
+# proc_yawn = AutoImageProcessor.from_pretrained(
+#     "afrizalmeka/yawning-model", token=hf_token
+# )
+
+from model.test_pytorch import (
+    ResNetFeatureExtractor,
+    LogisticRegressionModel,
+    extract_faces_from_video,
+    preprocess_faces_for_resnet,
+    DEVICE,
+    load_pytorch_model
 )
 
-model_eye = AutoModelForVideoClassification.from_pretrained(
-    "afrizalmeka/eyes-closed-model", token=hf_token
-)
-proc_eye = AutoImageProcessor.from_pretrained(
-    "afrizalmeka/eyes-closed-model", token=hf_token
-)
+# Load once saat file dijalankan
+feature_extractor_eye, classifier_eye = load_pytorch_model()
 
 
 
 def get_model_by_type(det_type):
     if det_type == "66":
-        return model_yawn, proc_yawn
+        # return model_yawn, proc_yawn
     elif det_type == "65":
-        return model_eye, proc_eye
+        return feature_extractor_eye, classifier_eye
     else:
         return None, None
 

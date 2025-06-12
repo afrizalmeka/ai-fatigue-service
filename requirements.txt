@@ -9,3 +9,7 @@ Pillow
 huggingface_hub
 python-dotenv
 opencv-python
+mediapipe
+openpyxl
+scikit-learn
+tqdm
