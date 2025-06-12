@@ -53,10 +53,11 @@ feature_extractor_eye, classifier_eye = load_pytorch_model()
 
 
 def get_model_by_type(det_type):
-    if det_type == "66":
-        # return model_yawn, proc_yawn
-    elif det_type == "65":
+    if det_type == "65":
         return feature_extractor_eye, classifier_eye
+    elif det_type == "66":
+        print("🔕 Deteksi yawning dinonaktifkan sementara (model belum siap).")
+        return None, None
     else:
         return None, None
 
