@@ -13,3 +13,4 @@ mediapipe
 openpyxl
 scikit-learn
 tqdm
+pandas
