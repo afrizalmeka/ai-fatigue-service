@@ -1,4 +1,5 @@
 import httpx
+from auth import get_token  # import token login
 
 API_URL = "https://vsscustom.report.api.lacak.io/incident-ticket"
 
@@ -8,12 +9,14 @@ async def send_result_to_be(alarm_id: str, device_no: str):
         "device_no": device_no
     }
 
+    token = await get_token()  # get fresh token every call
+
     async with httpx.AsyncClient() as client:
         response = await client.post(
             API_URL,
             json=payload,
             headers={
-                "Authorization": "Bearer 61af9814785540fc88bca93e147bb83b",
+                "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json"
             }
         )
