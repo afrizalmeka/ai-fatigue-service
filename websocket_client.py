@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 import os
 import traceback
 
-WS_URL = "wss://vsscustom.report.api.lacak.io/vss-ticket-websocket?email=ckbmb@test.com"
+WS_URL = "wss://vsscustom.report.api.lacak.io/vss-ticket-websocket?email=ciptakridatama.kim@gmail.com"
 AUTH_URL = "https://vsscustom.report.api.lacak.io/auth/login"
 USERNAME = "ckkim"
 PASSWORD = "Ck-kim24"
@@ -56,7 +56,7 @@ def get_model_by_type(det_type):
         return None, None
 
 async def predict_fatigue(data: dict) -> bool:
-    det_type = str(data.get("det_tp", ""))  # <-- perubahan di sini
+    det_type = str(data.get("det_type", ""))  # <-- perubahan di sini
     directory = data.get("directory")
     video_file_name = data.get("video_file_name")
 

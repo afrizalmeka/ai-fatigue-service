@@ -9,5 +9,12 @@ async def send_result_to_be(alarm_id: str, device_no: str):
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(API_URL, json=payload)
+        response = await client.post(
+            API_URL,
+            json=payload,
+            headers={
+                "Authorization": "Bearer 61af9814785540fc88bca93e147bb83b",
+                "Content-Type": "application/json"
+            }
+        )
         print(f"Sent result to BE: {response.status_code} | {response.text}")
