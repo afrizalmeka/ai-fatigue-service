@@ -61,33 +61,62 @@ def get_model_by_type(det_type):
         return None, None
 
 async def predict_fatigue(data: dict) -> bool:
-    det_type = str(data.get("det_tp", ""))  # <-- perubahan di sini
+    det_type = str(data.get("det_tp", ""))
     directory = data.get("directory")
     video_file_name = data.get("video_file_name")
 
     model, processor = get_model_by_type(det_type)
     if not model or not processor:
-        print("det_type tidak dikenali:", det_type)
+        print("❌ det_type tidak dikenali:", det_type)
         return False
 
-    # Ambil thumbnail/frame dari video untuk testing (sementara pakai gambar .jpg jika tersedia)
-    image_url = f"{directory}/{video_file_name.replace('.mp4', '.jpg')}"
-    print("Ambil image dari:", image_url)
+    video_url = f"{directory}/{video_file_name}"
+    print(f"🔍 Proses video: {video_url}")
 
-    try:
-        response = requests.get(image_url, timeout=10)
-        image = Image.open(BytesIO(response.content)).convert("RGB")
-    except Exception as e:
-        print("Gagal download atau baca gambar:", e)
+    # Untuk yawning (det_type == 66), gunakan HuggingFace
+    if det_type == "66":
+        try:
+            image_url = video_url.replace(".mp4", ".jpg")
+            response = requests.get(image_url, timeout=10)
+            image = Image.open(BytesIO(response.content)).convert("RGB")
+        except Exception as e:
+            print("⚠️ Gagal ambil gambar:", e)
+            return False
+
+        inputs = processor(images=image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs)
+        predicted = outputs.logits.argmax(-1).item() == 1
+        print(f"Hasil yawning: {predicted}")
+        return predicted
+
+    # Untuk eyes closed (det_type == 65), gunakan model PyTorch lokal
+    elif det_type == "65":
+        from model.test_pytorch import extract_faces_from_video, preprocess_faces_for_resnet, DEVICE
+
+        face_crops = extract_faces_from_video(video_url)
+        if not face_crops:
+            print("⚠️ Tidak ada wajah terdeteksi")
+            return False
+
+        face_tensor = preprocess_faces_for_resnet(face_crops)
+        if face_tensor is None:
+            print("⚠️ Preprocessing gagal")
+            return False
+
+        face_tensor = face_tensor.to(DEVICE)
+
+        with torch.no_grad():
+            features = model(face_tensor)
+            output = processor(features).squeeze()
+            confidence = output.item()
+            print(f"Confidence eyes closed: {confidence:.4f}")
+
+        return confidence > 0.33
+
+    else:
+        print("⏭️ Deteksi tidak relevan.")
         return False
-
-    inputs = processor(images=image, return_tensors="pt")
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    predicted = outputs.logits.argmax(-1).item() == 1
-    print(f"Hasil prediksi (det_type {det_type}):", predicted)
-    return predicted
 
 async def handle_message(message: str):
     print("📩 Raw WebSocket message:", repr(message), flush=True)  # tampilkan isi asli pesan apa adanya
