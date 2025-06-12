@@ -18,7 +18,7 @@ from datetime import datetime
 # Hardcoded variables
 TEST_FOLDER = "TEST ALL"
 EXCEL_FILE = "Result Ai Testing Eye Close.xlsx"
-MODEL_PATH = "eye_closed_pytorch_model_best1.pth"
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "eye_closed_pytorch_model_best1.pth")
 OUTPUT_EXCEL = "AI_Test_Results.xlsx"  # New output file
 FRAMES_TO_SAMPLE = 20  # Same as training
 CONFIDENCE_THRESHOLD = 0.4
