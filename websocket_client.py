@@ -56,7 +56,7 @@ def get_model_by_type(det_type):
         return None, None
 
 async def predict_fatigue(data: dict) -> bool:
-    det_type = str(data.get("det_type", ""))  # <-- perubahan di sini
+    det_type = str(data.get("det_tp", ""))  # <-- perubahan di sini
     directory = data.get("directory")
     video_file_name = data.get("video_file_name")
 
