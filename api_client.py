@@ -6,7 +6,8 @@ API_URL = "https://vsscustom.report.api.lacak.io/incident-ticket"
 async def send_result_to_be(alarm_id: str, device_no: str):
     payload = {
         "alarm_id": alarm_id,
-        "device_no": device_no
+        "device_no": device_no,
+        "alarmType": "FATIGUE_ALERT"
     }
 
     token = await get_token()  # get fresh token every call
