@@ -13,3 +13,4 @@ openpyxl
 scikit-learn
 tqdm
 pandas
+ultralytics==8.1.3
