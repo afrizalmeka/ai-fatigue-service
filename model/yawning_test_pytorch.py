@@ -348,7 +348,7 @@ def load_pytorch_model():
     feature_extractor.eval()
     classifier.eval()
     
-    print(f"Model loaded successfully! Best validation F1-score: {checkpoint.get('best_val_f1', 'N/A')}")
+    # print(f"Model loaded successfully! Best validation F1-score: {checkpoint.get('best_val_f1', 'N/A')}")
     print(f"Backbone trainable: {backbone_trainable}")
     
     # Check if target frames match

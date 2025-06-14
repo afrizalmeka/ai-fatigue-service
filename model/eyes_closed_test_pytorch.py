@@ -283,7 +283,7 @@ def load_pytorch_model():
     feature_extractor.eval()
     classifier.eval()
     
-    print(f"Model loaded successfully! Best validation accuracy: {checkpoint['best_val_acc']:.2f}%")
+    # print(f"Model loaded successfully! Best validation accuracy: {checkpoint['best_val_acc']:.2f}%")
     
     # Check if target frames match
     if 'target_frames' in checkpoint:
