@@ -18,7 +18,7 @@ from datetime import datetime
 # Hardcoded variables
 TEST_FOLDER = "TEST ALL"
 EXCEL_FILE = "Result Ai Testing Yawning.xlsx"
-MODEL_PATH = "yawning_pytorch_model.pth"
+MODEL_PATH = "model/yawning_pytorch_model_best2.pth"
 OUTPUT_EXCEL = "AI_Yawning_Test_Results.xlsx"  # New output file
 FRAMES_TO_SAMPLE = 20  # Same as training
 CONFIDENCE_THRESHOLD = 0.25
