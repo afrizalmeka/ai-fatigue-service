@@ -83,7 +83,7 @@ async def predict_fatigue(data: dict) -> Tuple[bool, float]:
         with torch.no_grad():
             features = model(face_tensor)
             output = processor(features).squeeze()
-            confidence = output.item()
+            confidence = torch.sigmoid(output).item() 
             print(f"Confidence yawning: {confidence:.4f}")
 
         return confidence > 0.5, confidence
@@ -163,12 +163,22 @@ async def start_websocket_listener():
             token = await get_token()
             headers = [("Authorization", f"Bearer {token}")]
 
-            async with websockets.connect(WS_URL, extra_headers=headers) as websocket:
-                print("Connected to WebSocket")
+            async with websockets.connect(
+                WS_URL,
+                extra_headers=headers,
+                ping_interval=30,
+                ping_timeout=60
+            ) as websocket:
+                print("✅ Connected to WebSocket")
                 while True:
                     msg = await websocket.recv()
                     await handle_message(msg)
+
+        except websockets.exceptions.ConnectionClosedError as e:
+            print(f"🛑 WebSocket connection closed: {e}. Retrying in 5s...")
+            await asyncio.sleep(5)
+
         except Exception as e:
-            print(f"WebSocket error: {e}. Retrying in 5s...")
+            print(f"⚠️ WebSocket error: {e}. Retrying in 5s...")
             traceback.print_exc()
             await asyncio.sleep(5)
