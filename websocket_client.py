@@ -42,7 +42,7 @@ if not os.getenv("GITHUB_ACTIONS"):
 
 # Load once saat file dijalankan
 feature_extractor_eye, classifier_eye = load_pytorch_model()
-feature_extractor_yawn, classifier_yawn = load_yawning_model()
+feature_extractor_yawn, classifier_yawn, _, _ = load_yawning_model()
 
 def get_model_by_type(det_type):
     if det_type == "65":
