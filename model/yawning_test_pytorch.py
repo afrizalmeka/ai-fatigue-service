@@ -24,7 +24,7 @@ FRAMES_TO_SAMPLE = 20  # Same as training
 CONFIDENCE_THRESHOLD = 0.25
 FACE_SIZE = 448
 TARGET_FRAMES = 40  # Must match training script
-YOLO_WEIGHTS_PATH = "yawning_best.pt"  # Path to YOLO weights
+YOLO_WEIGHTS_PATH = os.path.join("model", "yawning_best.pt") # Path to YOLO weights
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Initialize YOLO model
