@@ -83,7 +83,7 @@ async def predict_fatigue(data: dict) -> Tuple[bool, float]:
         with torch.no_grad():
             features = model(face_tensor)
             output = processor(features).squeeze()
-            confidence = output.item() 
+            confidence = torch.sigmoid(output).item() 
             print(f"Confidence yawning: {confidence:.4f}")
 
         return confidence > 0.5, confidence
